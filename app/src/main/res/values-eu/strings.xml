@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Awakener</string>
+    <string name="empty_list_message">Ez dago alarmarik programatu</string>
+    <string name="TypeClassic">Klasikoa</string>
+    <string name="TypeGuessTheNumber">Asmatu zenbakia</string>
+    <string name="TextChooseAlarmType">Aukeratu Alarma mota</string>
+    <string name="TextHigher">GOIAGOA</string>
+    <string name="TextLower">BAXUAGOA</string>
+    <string name="TextCongratulations">Zorionak!</string>
+    <string name="TextYouGuessedCorrect">Zenbaki zuzena asmatu duzu!</string>
+    <string name="ButtonOK">Ados</string>
+    <string name="ToastAddAlarm">Alarma berria gehitu da:</string>
+    <string name="TextDeleteAlarm">Ezabatu alarma</string>
+    <string name="TextYouSureDeleteAlarm">Ziur alarma hau ezabatu nahi duzula?</string>
+    <string name="ButtonCancel">Utzi</string>
+    <string name="ToastDeleteAlarm">Alarma ezabatu da:</string>
+    <string name="TextTesting">PROBA:</string>
+    <string name="TextAlarmName">Alarmaren izena</string>
+    <string name="TextSelectTime">Hautatu Ordua</string>
+    <string name="TextChooseType">Aukeratu Mota</string>
+    <string name="TextSelectedType">Hautatutako mota:</string>
+    <string name="TextAddAlarm">Gehitu alarma</string>
+    <string name="TextTurnOffAlarm">Desaktibatu alarma</string>
+    <string name="TextMakeAGuess">Asmatu</string>
+    <string name="TextEnterYourGuess">Sartu zure asmakizuna</string>
+    <string name="TextSubmit">Bidali</string>
+    <string name="ButtonConfirm">Konfirmatu</string>
+    <string name="TextSelectLanguage">Hautatu Hizkuntza</string>
+    <string-array name="languages_array">
+        <item>Ingelesa</item>
+        <item>Gaztelania</item>
+        <item>Euskera</item>
+    </string-array>
+    <string name="TextVibration">Alarma Bibrazioa</string>
+    <string name="NotiYourAlarm">Zure alarma:</string>
+    <string name="NotiProgrammedFor">programatua</string>
+    <string name="NotiHasBeenTriggered">martxan jarri da</string>
+</resources>

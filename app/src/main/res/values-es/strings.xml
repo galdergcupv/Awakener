@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Awakener</string>
+    <string name="empty_list_message">Ninguna alarma programada</string>
+    <string name="TypeClassic">Clásica</string>
+    <string name="TypeGuessTheNumber">Adivina el número</string>
+    <string name="TextChooseAlarmType">Elige Tipo de Alarma</string>
+    <string name="TextHigher">MAYOR</string>
+    <string name="TextLower">MENOR</string>
+    <string name="TextCongratulations">Felicidades!</string>
+    <string name="TextYouGuessedCorrect">Has acertado el número correcto!</string>
+    <string name="ButtonOK">Aceptar</string>
+    <string name="ToastAddAlarm">"Nueva alarma añadida: "</string>
+    <string name="TextDeleteAlarm">Eliminar Alarma</string>
+    <string name="TextYouSureDeleteAlarm">Seguro que quieres eliminar esta alarma?</string>
+    <string name="ButtonCancel">Cancelar</string>
+    <string name="ToastDeleteAlarm">"Alarma eliminada: "</string>
+    <string name="TextTesting">"PRUEBA: "</string>
+    <string name="TextAlarmName">Nombre de Alarma</string>
+    <string name="TextSelectTime">Seleccionar Hora</string>
+    <string name="TextChooseType">Elegir Tipo</string>
+    <string name="TextSelectedType">"Tipo Seleccionado: "</string>
+    <string name="TextAddAlarm">Añadir Alarma</string>
+    <string name="TextTurnOffAlarm">Apagar Alarma</string>
+    <string name="TextMakeAGuess">Intenta adivinar</string>
+    <string name="TextEnterYourGuess">Ingresa un número</string>
+    <string name="TextSubmit">Enviar</string>
+    <string-array name="languages_array">
+        <item>Inglés</item>
+        <item>Español</item>
+        <item>Vasco</item>
+    </string-array>
+    <string name="ButtonConfirm">Confirmar</string>
+    <string name="TextSelectLanguage">Seleccione Idioma</string>
+    <string name="TextVibration">Vibración de alarma</string>
+    <string name="NotiYourAlarm">Tu alarma</string>
+    <string name="NotiProgrammedFor">programada para las</string>
+    <string name="NotiHasBeenTriggered">ha sido activada</string>
+</resources>

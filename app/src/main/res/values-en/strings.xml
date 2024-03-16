@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Awakener</string>
+    <string name="empty_list_message">No alarms programmed</string>
+    <string name="TypeClassic">Classic</string>
+    <string name="TypeGuessTheNumber">Guess the number</string>
+    <string name="TextChooseAlarmType">Choose Alarm Type</string>
+    <string name="TextHigher">HIGHER</string>
+    <string name="TextLower">LOWER</string>
+    <string name="TextCongratulations">Congratulations!</string>
+    <string name="TextYouGuessedCorrect">You guessed the correct number!</string>
+    <string name="ButtonOK">OK</string>
+    <string name="ToastAddAlarm">"New alarm added: "</string>
+    <string name="TextDeleteAlarm">Delete Alarm</string>
+    <string name="TextYouSureDeleteAlarm">Are you sure you want to delete this alarm?</string>
+    <string name="ButtonCancel">Cancel</string>
+    <string name="ToastDeleteAlarm">"Alarm deleted: "</string>
+    <string name="TextTesting">TESTING:</string>
+    <string name="TextAlarmName">Alarm Name</string>
+    <string name="TextSelectTime">Select Time</string>
+    <string name="TextChooseType">Choose Type</string>
+    <string name="TextSelectedType">"Selected Type: "</string>
+    <string name="TextAddAlarm">Add Alarm</string>
+    <string name="TextTurnOffAlarm">Turn Off Alarm</string>
+    <string name="TextMakeAGuess">Make a guess</string>
+    <string name="TextEnterYourGuess">Enter your guess</string>
+    <string name="TextSubmit">Submit</string>
+    <string-array name="languages_array">
+        <item>English</item>
+        <item>Spanish</item>
+        <item>Basque</item>
+    </string-array>
+    <string name="ButtonConfirm">Confirm</string>
+    <string name="TextSelectLanguage">Select Language</string>
+    <string name="TextVibration">Alarm Vibration</string>
+    <string name="NotiYourAlarm">Your alarm:</string>
+    <string name="NotiProgrammedFor">programmed for</string>
+    <string name="NotiHasBeenTriggered">has been triggered</string>
+</resources>
