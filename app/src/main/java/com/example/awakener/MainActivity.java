@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements AddAlarmFragment.
         });
 
         // Display a toast message when the alarm is deleted
-        Toast.makeText(this, getString(R.string.TextDeleteAlarm) + " " + alarm.getName() + " (" + alarm.getTime() + ")", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.ToastDeleteAlarm) + " " + alarm.getName() + " (" + alarm.getTime() + ")", Toast.LENGTH_SHORT).show();
     }
 
     @Override
