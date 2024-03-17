@@ -64,7 +64,7 @@ public class SettingsFragment extends Fragment {
         return root;
     }
 
-    // Save preferences on pref file (TODO)
+    // Save preferences
     private void saveLanguagePreference(String language) {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

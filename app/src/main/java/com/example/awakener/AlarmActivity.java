@@ -4,12 +4,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -19,6 +24,7 @@ import android.os.Vibrator;
 import android.util.Log;
 import android.widget.FrameLayout;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AlarmActivity extends AppCompatActivity {
@@ -35,6 +41,7 @@ public class AlarmActivity extends AppCompatActivity {
     private static final String CHANNEL_DESCRIPTION = "Channel for alarm notifications";
     // Unique ID for the notification
     private static final int NOTIFICATION_ID = 123;
+    boolean isAlarm;
 
 
     @Override
@@ -44,14 +51,65 @@ public class AlarmActivity extends AppCompatActivity {
 
         createNotificationChannel();
 
+        // Get the SharedPreferences instance
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+        // Retrieve the language preference, defaulting to "en" if it's not set yet
+        String language = sharedPreferences.getString("language", "en");
+
+        // Set the locale based on the language preference
+        setLocale(language);
+
         infoFragmentContainer = findViewById(R.id.info_fragment_container);
         controlFragmentContainer = findViewById(R.id.control_fragment_container);
 
         alarmDatabase = AlarmDatabase.getInstance(this);
 
+        // Restore the state of the fragments if savedInstanceState is not null
+        if (savedInstanceState != null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+
+            // Restore AlarmInfoFragment
+            Fragment infoFragment = fragmentManager.getFragment(savedInstanceState, "info_fragment");
+            if (infoFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.info_fragment_container, infoFragment)
+                        .commit();
+            }
+
+            // Restore AlarmControlFragment
+            Fragment controlFragment = fragmentManager.getFragment(savedInstanceState, "control_fragment");
+            if (controlFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.control_fragment_container, controlFragment)
+                        .commit();
+            }
+
+            isAlarm = savedInstanceState.getBoolean("isAlarm");
+            if (isAlarm){
+                mediaPlayer = MediaPlayer.create(this, R.raw.alarm);
+                vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+                wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "AlarmActivity:wakeLock");
+
+                if (true) { // TODO: Change to vibrator preference
+
+                    long[] pattern = {0, 1000, 1000}; // Vibrate for 1 second, then pause for 1 second
+                    vibrator.vibrate(pattern, 0);
+                }
+
+                wakeLock.acquire();
+
+                // Start playing the alarm sound
+                mediaPlayer.setLooping(true);
+                mediaPlayer.start();
+            }
+
+        }
+
 
         if (savedInstanceState == null) {
-            boolean isAlarm = getIntent().getBooleanExtra("isAlarm", false);
+            isAlarm = getIntent().getBooleanExtra("isAlarm", false);
             Log.d("AlarmActivity", "isAlarm: " + isAlarm);
 
             mediaPlayer = MediaPlayer.create(this, R.raw.alarm);
@@ -139,15 +197,12 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        mediaPlayer.stop();
-
-        vibrator.cancel();
-
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
         }
 
         if (mediaPlayer != null) {
+            mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
         }
@@ -157,6 +212,7 @@ public class AlarmActivity extends AppCompatActivity {
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
         }
+
     }
 
     private void switchControlFragment() {
@@ -212,6 +268,38 @@ public class AlarmActivity extends AppCompatActivity {
             return;
         }
         notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save the state of the fragments in the fragment holders
+        getSupportFragmentManager().putFragment(outState, "info_fragment", getSupportFragmentManager().findFragmentById(R.id.info_fragment_container));
+        getSupportFragmentManager().putFragment(outState, "control_fragment", getSupportFragmentManager().findFragmentById(R.id.control_fragment_container));
+        outState.putBoolean("isAlarm", isAlarm);
+    }
+
+    private void setLocale(String language) {
+        Locale locale;
+        switch (language) {
+            case "en":
+                locale = new Locale("en");
+                break;
+            case "es":
+                locale = new Locale("es", "ES");
+                break;
+            case "eu":
+                locale = new Locale("eu", "ES"); // Basque language code
+                break;
+            default:
+                locale = new Locale("en");
+                break;
+        }
+        Resources resources = getResources();
+        Configuration configuration = resources.getConfiguration();
+        configuration.setLocale(locale);
+        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
     }
 
 }

@@ -34,6 +34,7 @@ public class AddAlarmFragment extends Fragment {
 
     private int selectedTypeIndex = 0;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -51,6 +52,27 @@ public class AddAlarmFragment extends Fragment {
 
         chooseTypeButton = view.findViewById(R.id.choose_type_button);
         selectedTypeTextView = view.findViewById(R.id.selected_type_text_view);
+
+
+
+        // Restore state if available
+        if (savedInstanceState != null) {
+            String savedTime = savedInstanceState.getString("time");
+            if (savedTime != null) {
+                timeTextView.setText(savedTime);
+            }
+
+            String savedName = savedInstanceState.getString("name");
+            if (savedName != null) {
+                nameEditText.setText(savedName);
+            }
+
+            selectedTypeIndex = savedInstanceState.getInt("type");
+
+        }
+        else{
+            updateTimeTextViewToCurrentTime();
+        }
         selectedTypeTextView.setText(ALARM_TYPES[selectedTypeIndex]);
 
         alarmDatabase = AlarmDatabase.getInstance(getActivity());
@@ -69,7 +91,6 @@ public class AddAlarmFragment extends Fragment {
             }
         });
 
-        updateTimeTextViewToCurrentTime();
 
         chooseTypeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,5 +166,18 @@ public class AddAlarmFragment extends Fragment {
             }
         });
         builder.show();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Save fragment state
+        if (timeTextView != null) {
+            outState.putString("time", timeTextView.getText().toString());
+        }
+        if (nameEditText != null) {
+            outState.putString("name", nameEditText.getText().toString());
+        }
+        outState.putInt("type", selectedTypeIndex);
     }
 }

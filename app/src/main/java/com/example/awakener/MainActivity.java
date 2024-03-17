@@ -3,10 +3,15 @@ package com.example.awakener;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -18,10 +23,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -48,6 +55,15 @@ public class MainActivity extends AppCompatActivity implements AddAlarmFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Get the SharedPreferences instance
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+        // Retrieve the language preference, defaulting to "en" if it's not set yet
+        String language = sharedPreferences.getString("language", "en");
+
+        // Set the locale based on the language preference
+        setLocale(language);
+
         // Initialize views
         fragmentContainer = findViewById(R.id.fragment_container);
         emptyListTextView = findViewById(R.id.empty_list_textview);
@@ -58,17 +74,37 @@ public class MainActivity extends AppCompatActivity implements AddAlarmFragment.
         // Initialize the database
         alarmDatabase = AlarmDatabase.getInstance(this);
 
+        Log.d("MainActivity", "SavedInstance = null: " + (savedInstanceState == null));
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
         // Check if there are any alarms in the database
         AsyncTask.execute(() -> {
-            List<Alarm> alarmList = alarmDatabase.alarmDao().getAll();
+            alarmList = alarmDatabase.alarmDao().getAll();
             // Update the UI on the main thread
             runOnUiThread(() -> {
-                // Load the alarm list fragment
-                loadAlarmListFragment();
+                // Restore the state of the fragment if savedInstanceState is not null
+                if (savedInstanceState != null) {
+                    // Restore the current fragment
+                    Fragment currentFragment = fragmentManager.getFragment(savedInstanceState, "fragment");
+                    Log.d("MainActivity", "Fragment typeOnLoad: " + currentFragment.getClass().getName());
+
+                    if (currentFragment != null) {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, currentFragment)
+                                .commitAllowingStateLoss();
+                    }
+                    Log.d("MainActivity", "Fragment type Loaded: " + getSupportFragmentManager().findFragmentById(R.id.fragment_container).getClass().getName());
+                    // Update view visibility based on alarm count
+                    updateViewVisibility();
+                }
+                else {
+                    // Load the alarm list fragment
+                    loadAlarmListFragment();
+                }
+
             });
         });
 
-        alarmList = new ArrayList<>();
         alarmAdapter = new AlarmAdapter(this, alarmList, this);
         alarmAdapter.setOnAlarmLongClickListener(this);
 
@@ -115,10 +151,39 @@ public class MainActivity extends AppCompatActivity implements AddAlarmFragment.
             }
         });
 
+
+        Log.d("MainActivity", "Fragment type null?: " + (getSupportFragmentManager().findFragmentById(R.id.fragment_container) == null));
+
+    }
+
+    private void setLocale(String language) {
+        // Create a Locale object based on the language preference
+        Locale locale;
+        switch (language) {
+            case "en":
+                locale = new Locale("en");
+                break;
+            case "es":
+                locale = new Locale("es", "ES");
+                break;
+            case "eu":
+                locale = new Locale("eu", "ES"); // Basque language code
+                break;
+            default:
+                locale = new Locale("en");
+                break;
+        }
+
+        // Set the locale for the entire application
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 
 
     private void loadAlarmListFragment() {
+        Log.d("MainActivity", "AlarmList loaded");
         // Perform database operation asynchronously using Room's built-in support for async queries
         AsyncTask.execute(() -> {
             alarmList = alarmDatabase.alarmDao().getAll();
@@ -126,10 +191,13 @@ public class MainActivity extends AppCompatActivity implements AddAlarmFragment.
             runOnUiThread(() -> {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new AlarmListFragment())
+                        .runOnCommit(() -> { // THIS MAKES IT WORK!!!
+                            // Update visibility of views after loading the fragment
+                            updateViewVisibility();
+                        })
                         .commit();
-                // Update visibility of views after loading the fragment
-                updateViewVisibility();
             });
+
         });
     }
 
@@ -152,11 +220,14 @@ public class MainActivity extends AppCompatActivity implements AddAlarmFragment.
 
 
     private void updateViewVisibility() {
-        if (alarmList.isEmpty()) {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (alarmList.isEmpty() && currentFragment instanceof AlarmListFragment ) {
             emptyListTextView.setVisibility(View.VISIBLE);
         } else {
             emptyListTextView.setVisibility(View.GONE);
         }
+
+
     }
 
     private void openAddAlarmFragment() {
@@ -246,13 +317,13 @@ public class MainActivity extends AppCompatActivity implements AddAlarmFragment.
         showDeleteConfirmationDialog(alarm);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadAlarmListFragment();
-        emptyListTextView = findViewById(R.id.empty_list_textview);
-        emptyListTextView.setText(R.string.empty_list_message);
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        loadAlarmListFragment();
+//        emptyListTextView = findViewById(R.id.empty_list_textview);
+//        emptyListTextView.setText(R.string.empty_list_message);
+//    }
 
     private void scheduleAlarm(Alarm alarm) {
         // Parse the time string into hours and minutes
@@ -313,6 +384,19 @@ public class MainActivity extends AppCompatActivity implements AddAlarmFragment.
                         new String[]{android.Manifest.permission.ACCESS_NOTIFICATION_POLICY},
                         PERMISSION_REQUEST_CODE);
             }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save the state of the current fragment
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        Log.d("MainActivity", "Fragment type onSave: " + currentFragment.getClass().getName());
+
+        if (currentFragment != null) {
+            getSupportFragmentManager().putFragment(outState, "fragment", currentFragment);
         }
     }
 

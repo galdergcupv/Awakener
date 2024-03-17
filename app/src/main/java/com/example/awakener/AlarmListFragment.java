@@ -51,13 +51,15 @@ public class AlarmListFragment extends Fragment {
             public void run() {
                 List<Alarm> alarmList = alarmDatabase.alarmDao().getAll();
                 // Update the UI on the main thread
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Update the dataset of the adapter with the loaded alarms
-                        alarmAdapter.setAlarmList(alarmList);
-                    }
-                });
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Update the dataset of the adapter with the loaded alarms
+                            alarmAdapter.setAlarmList(alarmList);
+                        }
+                    });
+                }
             }
         });
     }
